@@ -144,7 +144,11 @@ public class StringReader implements ImmutableStringReader {
 
     public double readDouble() throws CommandSyntaxException {
         final int start = cursor;
-        while (canRead() && isAllowedNumber(peek())) {
+        DecimalState state = DecimalState.INTEGER;
+        if (canRead() && peek() == '-') {
+            skip();
+        }
+        while (canRead() && (state = state.next(peek())) != null) {
             skip();
         }
         final String number = string.substring(start, cursor);
@@ -161,7 +165,11 @@ public class StringReader implements ImmutableStringReader {
 
     public float readFloat() throws CommandSyntaxException {
         final int start = cursor;
-        while (canRead() && isAllowedNumber(peek())) {
+        DecimalState state = DecimalState.INTEGER;
+        if (canRead() && peek() == '-') {
+            skip();
+        }
+        while (canRead() && (state = state.next(peek())) != null) {
             skip();
         }
         final String number = string.substring(start, cursor);
@@ -263,5 +271,25 @@ public class StringReader implements ImmutableStringReader {
             throw CommandSyntaxException.BUILT_IN_EXCEPTIONS.readerExpectedSymbol().createWithContext(this, String.valueOf(c));
         }
         skip();
+    }
+
+    private enum DecimalState {
+        INTEGER,
+        FRACTIONAL,
+        EXPONENT;
+
+        private DecimalState next(char c) {
+            switch (this) {
+                case INTEGER:
+                    if (c == '.') {
+                        return FRACTIONAL;
+                    }
+                case FRACTIONAL:
+                    if (c == 'e' | c == 'E') {
+                        return EXPONENT;
+                    }
+            }
+            return isAsciiDigit(c) ? this : null;
+        }
     }
 }

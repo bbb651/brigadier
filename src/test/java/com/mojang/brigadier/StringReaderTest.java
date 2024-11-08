@@ -467,6 +467,22 @@ public class StringReaderTest {
     }
 
     @Test
+    public void readDouble_withExponent() throws Exception {
+        final StringReader reader = new StringReader("12e34");
+        assertThat(reader.readDouble(), is(12e34));
+        assertThat(reader.getRead(), equalTo("12e34"));
+        assertThat(reader.getRemaining(), equalTo(""));
+    }
+
+    @Test
+    public void readDouble_withDecimalAndExponent() throws Exception {
+        final StringReader reader = new StringReader("1.2e3");
+        assertThat(reader.readDouble(), is(1.2e3));
+        assertThat(reader.getRead(), equalTo("1.2e3"));
+        assertThat(reader.getRemaining(), equalTo(""));
+    }
+
+    @Test
     public void readDouble_negative() throws Exception {
         final StringReader reader = new StringReader("-123");
         assertThat(reader.readDouble(), is(-123.0));
@@ -477,12 +493,20 @@ public class StringReaderTest {
     @Test
     public void readDouble_invalid() throws Exception {
         try {
-            new StringReader("12.34.56").readDouble();
+            new StringReader(".").readDouble();
             fail();
         } catch (final CommandSyntaxException ex) {
             assertThat(ex.getType(), is(CommandSyntaxException.BUILT_IN_EXCEPTIONS.readerInvalidDouble()));
             assertThat(ex.getCursor(), is(0));
         }
+    }
+
+    @Test
+    public void readDouble_incomplete() throws Exception {
+        final StringReader reader = new StringReader("12.34.56");
+        assertThat(reader.readDouble(), is(12.34));
+        assertThat(reader.getRead(), equalTo("12.34"));
+        assertThat(reader.getRemaining(), equalTo(".56"));
     }
 
     @Test
@@ -529,6 +553,22 @@ public class StringReaderTest {
     }
 
     @Test
+    public void readFloat_withExponent() throws Exception {
+        final StringReader reader = new StringReader("12e34");
+        assertThat(reader.readFloat(), is(12e34f));
+        assertThat(reader.getRead(), equalTo("12e34"));
+        assertThat(reader.getRemaining(), equalTo(""));
+    }
+
+    @Test
+    public void readFloat_withDecimalAndExponent() throws Exception {
+        final StringReader reader = new StringReader("1.2e3");
+        assertThat(reader.readFloat(), is(1.2e3f));
+        assertThat(reader.getRead(), equalTo("1.2e3"));
+        assertThat(reader.getRemaining(), equalTo(""));
+    }
+
+    @Test
     public void readFloat_negative() throws Exception {
         final StringReader reader = new StringReader("-123");
         assertThat(reader.readFloat(), is(-123.0f));
@@ -539,12 +579,20 @@ public class StringReaderTest {
     @Test
     public void readFloat_invalid() throws Exception {
         try {
-            new StringReader("12.34.56").readFloat();
+            new StringReader(".").readFloat();
             fail();
         } catch (final CommandSyntaxException ex) {
             assertThat(ex.getType(), is(CommandSyntaxException.BUILT_IN_EXCEPTIONS.readerInvalidFloat()));
             assertThat(ex.getCursor(), is(0));
         }
+    }
+
+    @Test
+    public void readFloat_incomplete() throws Exception {
+        final StringReader reader = new StringReader("12.34.56");
+        assertThat(reader.readFloat(), is(12.34f));
+        assertThat(reader.getRead(), equalTo("12.34"));
+        assertThat(reader.getRemaining(), equalTo(".56"));
     }
 
     @Test
