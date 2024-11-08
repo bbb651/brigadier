@@ -84,6 +84,10 @@ public class StringReader implements ImmutableStringReader {
         cursor++;
     }
 
+    public static boolean isAsciiDigit(final char c) {
+        return c >= '0' && c <= '9';
+    }
+
     public static boolean isAllowedNumber(final char c) {
         return c >= '0' && c <= '9' || c == '.' || c == '-';
     }
@@ -100,7 +104,10 @@ public class StringReader implements ImmutableStringReader {
 
     public int readInt() throws CommandSyntaxException {
         final int start = cursor;
-        while (canRead() && isAllowedNumber(peek())) {
+        if (canRead() && peek() == '-') {
+            skip();
+        }
+        while (canRead() && isAsciiDigit(peek())) {
             skip();
         }
         final String number = string.substring(start, cursor);
@@ -117,7 +124,10 @@ public class StringReader implements ImmutableStringReader {
 
     public long readLong() throws CommandSyntaxException {
         final int start = cursor;
-        while (canRead() && isAllowedNumber(peek())) {
+        if (canRead() && peek() == '-') {
+            skip();
+        }
+        while (canRead() && isAsciiDigit(peek())) {
             skip();
         }
         final String number = string.substring(start, cursor);

@@ -323,12 +323,31 @@ public class StringReaderTest {
     @Test
     public void readInt_invalid() throws Exception {
         try {
-            new StringReader("12.34").readInt();
+            new StringReader("-").readInt();
             fail();
         } catch (final CommandSyntaxException ex) {
             assertThat(ex.getType(), is(CommandSyntaxException.BUILT_IN_EXCEPTIONS.readerInvalidInt()));
             assertThat(ex.getCursor(), is(0));
         }
+    }
+
+    @Test
+    public void readInt_unexpected() throws Exception {
+        try {
+            new StringReader(".1234").readInt();
+            fail();
+        } catch (final CommandSyntaxException ex) {
+            assertThat(ex.getType(), is(CommandSyntaxException.BUILT_IN_EXCEPTIONS.readerExpectedInt()));
+            assertThat(ex.getCursor(), is(0));
+        }
+    }
+
+    @Test
+    public void readInt_incomplete() throws Exception {
+        final StringReader reader = new StringReader("12.34");
+        assertThat(reader.readInt(), is(12));
+        assertThat(reader.getRead(), equalTo("12"));
+        assertThat(reader.getRemaining(), equalTo(".34"));
     }
 
     @Test
@@ -377,12 +396,31 @@ public class StringReaderTest {
     @Test
     public void readLong_invalid() throws Exception {
         try {
-            new StringReader("12.34").readLong();
+            new StringReader("-").readLong();
             fail();
         } catch (final CommandSyntaxException ex) {
             assertThat(ex.getType(), is(CommandSyntaxException.BUILT_IN_EXCEPTIONS.readerInvalidLong()));
             assertThat(ex.getCursor(), is(0));
         }
+    }
+
+    @Test
+    public void readLong_unexpected() throws Exception {
+        try {
+            new StringReader(".1234").readLong();
+            fail();
+        } catch (final CommandSyntaxException ex) {
+            assertThat(ex.getType(), is(CommandSyntaxException.BUILT_IN_EXCEPTIONS.readerExpectedLong()));
+            assertThat(ex.getCursor(), is(0));
+        }
+    }
+
+    @Test
+    public void readLong_incomplete() throws Exception {
+        final StringReader reader = new StringReader("12.34");
+        assertThat(reader.readLong(), is(12L));
+        assertThat(reader.getRead(), equalTo("12"));
+        assertThat(reader.getRemaining(), equalTo(".34"));
     }
 
     @Test
